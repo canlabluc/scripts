@@ -23,13 +23,13 @@ def prettyprint(coefs, names=None, sort=False, n_coefs=20):
     return " + \n".join("%s * %s" % (round(coef, 3), name) for coef, name in lst)
 
 ### Data IO and variable selection
-aging      = pd.read_csv('data/madb_intclasses_use.csv', header=0).astype(np.float) # Full dataset
-superagers = pd.read_csv('data/super-agers.csv', header=0).astype(np.float)         # Only super-agers
-mci        = pd.read_csv('data/mcis.csv', header=0).astype(np.float)                # Only MCIs
-train_set  = pd.read_csv('data/train_data.csv', header=0).astype(np.float)          # Remaining set from below
-test_set   = pd.read_csv('data/test_data.csv', header=0).astype(np.float)           # Small set with mix of all
+aging      = pd.read_csv('../2015-11/lassomodel/data/madb_intclasses_use.csv', header=0).astype(np.float) # Full dataset
+superagers = pd.read_csv('../2015-11/lassomodel/data/super-agers.csv', header=0).astype(np.float)         # Only super-agers
+mci        = pd.read_csv('../2015-11/lassomodel/data/mcis.csv', header=0).astype(np.float)                # Only MCIs
+train_set  = pd.read_csv('../2015-11/lassomodel/data/train_data.csv', header=0).astype(np.float)          # Remaining set from below
+test_set   = pd.read_csv('../2015-11/lassomodel/data/test_data.csv', header=0).astype(np.float)           # Small set with mix of all
 
-interest = 'LM_2'
+interest = 'RAVLT_DEL'
 # col = list(aging.columns.values)[38:] # for EEG features only
 col = list(aging.columns.values)
 col.remove('Subject')
@@ -44,7 +44,7 @@ X_mci, y_mci     = mci[col], mci[interest]
 X_train, y_train = train_set[col], train_set[interest]
 X_test, y_test   = test_set[col], test_set[interest]
 
-### Stratify according to interest variable. In this case, memory classes
+### Stratify according to interest variable.
 score = 'mean_squared_error'
 tuned_params_lasso = [{'alpha': np.linspace(-1, 1, 100),
                        'normalize': [True, False]}]
@@ -56,22 +56,8 @@ regr_cv.fit( X_aging, y_aging )
 regr = regr_cv.best_estimator_
 
 print("Best estimator for WHOLE DATASET: \n{0}\n".format(regr_cv.best_estimator_))
-print(regr.score( X_aging, y_aging))
+print("Percent variance explained: {0}".format(regr.score( X_aging, y_aging)))
 print("Coefficients found: \n{0}\n".format(prettyprint(regr.coef_, col, sort=True)))
-# max = 0
-# alphas = np.linspace(-1, 1, 1000)
-# for i in range(len(alphas)):
-#     regr = Lasso(alpha=alphas[i], max_iter=100000)
-#     regr.fit( X_aging, y_aging )
-#     if max < regr.score( X_aging, y_aging ):
-#         max = alphas[i]
-
-# print(max)
-# regr = Lasso(alpha=0.0, max_iter=100000)
-# regr.fit( X_aging, y_aging )
-predictions = regr.predict(X_aging)
-print(regr.score( X_aging, y_aging ))
-print(metrics.explained_variance_score(y_aging, predictions))
 
 ### ACROSS SUPERAGERS
 regr_cv = GridSearchCV(Lasso(max_iter=100000), tuned_params_lasso, cv=7, scoring=score)
@@ -79,7 +65,7 @@ regr_cv.fit( X_sa, y_sa )
 regr = regr_cv.best_estimator_
 
 print("Best estimator for SUPER-AGERS: \n{0}\n".format(regr_cv.best_estimator_))
-print(regr.score( X_sa, y_sa ))
+print("Percent variance explained: {0}".format(regr.score( X_sa, y_sa )))
 print("Coefficients found: \n{0}\n".format(prettyprint(regr.coef_, col, sort=True)))
 
 ### ACROSS MCIs
@@ -88,7 +74,7 @@ regr_cv.fit( X_mci, y_mci )
 regr = regr_cv.best_estimator_
 
 print("Best estimator for MCIs: \n{0}\n".format(regr_cv.best_estimator_))
-print(regr.score( X_mci, y_mci ))
+print("Percentage variance explained: {0}".format(regr.score( X_mci, y_mci )))
 print("Coefficients found: \n{0}\n".format(prettyprint(regr.coef_, col, sort=True)))
 
 # ### Using a validation set
