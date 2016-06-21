@@ -1,5 +1,5 @@
-%userdirectory = uigetdir;%gets user's dir for samples to avg
-userdirectory = 'C:\Users\yatri\Desktop\testsamples'; %REMOVE HC LATER!
+userdirectory = uigetdir; %gets user's dir for samples to avg
+%userdirectory = 'C:\Users\yatri\Desktop\testsamples'; %REMOVE HC LATER!
 cd(userdirectory) %chngs directory to the user's specified directory
 
 Files = dir('*.mul*'); %finds all files w/ .mul file extension
@@ -18,21 +18,21 @@ end
 fprintf('\t1: Average & plot F9\n\t2: Average & plot A1\n\t3: Average & plot P9\n\t4: Average & plot Fp1\n\t5: Average & plot F7\n\t6: Average & plot T7\n\t7: Average & plot P7\n\t8: Average & plot O1\n\t9: Average & plot F3\n\t10: Average & plot C3\n\t11: Average & plot P3\n\t12: Average & plot Fpz\n\t13: Average & plot Fz\n\t14: Average & plot Cz\n\t15: Average & plot Pz\n\t16: Average & plot Oz\n\t17: Average & plot F4\n\t18: Average & plot C4\n\t19: Average & plot P4\n\t20: Average & plot Fp2\n\t21: Average & plot F8\n\t22: Average & plot T8\n\t23: Average & plot P8\n\t24: Average & plot O2\n\t25: Average & plot F10\n\t26: Average & plot A2\n\t27: Average & plot P10\n\t28: Average & plot ALL data\n ');
 UserChoose = input('What would you like to plot? Please type the number corressponding to your choice:  ', 's')
 
-X = str2double(UserChoose);
+X = str2double(UserChoose); %converts user's input into a number
 
-if X ~= 28
+if X ~= 28 %this loop will plot the specified channel in blue (channels are numbered 1-27) 
     for h = 1:length(Sample)-1 %go through all samples
-        ColumnSum = Sample(h).data(:,X) + Sample(h+1).data(:,X);
+        ColumnSum = Sample(h).data(:,X) + Sample(h+1).data(:,X); %get the column sum matrix of all samples
     end
-    AvgColumn = ColumnSum/length(Sample);2
-    t = size(A.data(:,1));
-    t = t(1);
-    time = 1:t;
-    plot(time, AvgColumn, 'b');
-    hold on
+    AvgColumn = ColumnSum/length(Sample);2 %averages the columnsum data by the number of samples added together
+    t = size(A.data(:,1)); %gets the range of the data
+    t = t(1); %how many seconds elapse
+    time = 1:t; %x axis defined as time elapsed from 1-t seconds
+    plot(time, AvgColumn, 'b'); %plog the Averaged channel against time in blue
+    hold on %do not erase the plotted channel in case another is to be plotted on it
 else end
 
-if X == 28 
+if X == 28 %if X is 28
     for j = 1:length(Sample)-1 %go through all samples
         SampleSum = Sample(j).data + Sample(j+1).data;
     end
