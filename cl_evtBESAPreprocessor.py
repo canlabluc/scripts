@@ -1,11 +1,35 @@
-""" evtBESAConsolidator
-Compiles BESA evt Code and Trigger columns
-into single event list.
+#!/usr/local/bin/python3
+""" cl_evtBESAPreprocessor
+Takes raw BESA-exported evt files and exports it as a cleaner pandas dataframe.
+BESA exports user-defined triggers and event codes in different columns, and
+cl_evtBESAPreprocessor consolidates them into a single column, 'Triggers'.
 
 Usage:
-    $ python cl_BESAevtparser.py import_path exportpath end_blinks
-    $ # Example:
-    $ python cl_BESAevtparser.py /raw-evt-data/ /clean-evt-data/ true
+    $ ./cl_BESAevtparser.py importpath exportpath
+
+Inputs:
+    importpath: Path to directory containing raw evt files.
+    exportpath: Path to directory into which to export processed evt files.
+
+Notes:
+    cl_evtBESAPreprocessor takes files that look like:
+
+    Tmu             Code    TriNo   Comnt
+    0               41      2012-10-26T11:27:56.000
+    33277           21      0
+    2162500         11      0       Pattern 1
+    3746484         11      0       Pattern 1
+    4793359         11      0       Pattern 1
+    ...
+
+    And produces files that look like:
+
+    Latency Trigger
+    17.0    ARTFCT1
+    1107.0  BLINK1
+    1918.0  BLINK1
+    2454.0  BLINK1
+    ...
 """
 
 import os

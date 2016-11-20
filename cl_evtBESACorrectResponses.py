@@ -1,3 +1,43 @@
+#!/usr/local/bin/python3
+""" cl_evtBESACorrectResponses
+Constructs evt file that contains only artifact-free correct responses in the
+Go-NoGo task. We obtain the Go-NoGo triggers from preprocessing the evt files
+using cl_evtBESAPreprocessor, and the clean segments from cl_evtBESACleanSegments.
+
+Usage:
+    $ ./cl_evtBESACorrectResponses.py importpath_preprocessed importpath_clean exportpath
+
+Inputs:
+    importpath_preprocessed: Directory containing evt files that have been preprocessed
+                             using cl_evtBESAPreprocessor.
+    importpath_clean: Directory containing evt files that have been preprocessed using
+                      cl_evtBESAPreprocessor and then through cl_evtBESACleanSegments.
+    exportpath: Directory in which to export processed evt files.
+
+Notes:
+    cl_evtBESACorrectResponses takes file that look like:
+
+    Latency Trigger
+    17.0    ARTFCT1
+    1107.0  BLINK1
+    1918.0  BLINK1
+    2454.0  BLINK1
+    ...
+
+    Latency Trigger
+    207252.0        C1
+    210038.0        C2
+    210243.0        C1
+    ...
+
+    and produces a file that looks like:
+
+    Latency Trigger
+    209897.0        NOGO_PROMPT
+    210426.0        RESPONSE
+    214680.0        NOGO_PROMPT
+"""
+
 import glob
 import os
 import sys
