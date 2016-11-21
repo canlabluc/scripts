@@ -67,10 +67,10 @@ for i in range(len(evt_files)):
     # Add end of blinks (400ms after BLINK1):
     blinks = df[df.Trigger.isin(['BLINK1'])]
     for j in range(blinks.shape[0]):
-    # 400ms ~ 205 sampling points
-    lat  = blinks.iloc[j].Latency + 205
-    trig = 'BLINK2'
-    df = df.append({'Latency': lat, 'Trigger': trig}, ignore_index=True)
+        # 400ms ~ 205 sampling points
+        lat  = blinks.iloc[j].Latency + 205
+        trig = 'BLINK2'
+        df = df.append({'Latency': lat, 'Trigger': trig}, ignore_index=True)
     df = df.sort_values('Latency')
     df = df.set_index(np.arange(0, df.shape[0], 1))
 
@@ -82,42 +82,42 @@ for i in range(len(evt_files)):
     # Drop all recording data prior to the beginning of trials.
     clean_idx = 0
     for j in range(df.shape[0]):
-    if df.iloc[j].Trigger == 'ARTFCT2':
-    clean_idx = j
-    break
+        if df.iloc[j].Trigger == 'ARTFCT2':
+            clean_idx = j
+            break
     clean = clean.append({'Latency': df.iloc[clean_idx].Latency,
-                         'Trigger': 'C1'}, ignore_index=True)
+                          'Trigger': 'C1'}, ignore_index=True)
     df = df.drop(np.arange(0, clean_idx+1, 1))
 
     # Grab all segments of recording that occur between blinks and artifacts.
     # These segments are added to the clean dataframe.
     for j in range(df.shape[0]):
-    if df.iloc[j].Trigger == 'BLINK1':
-    clean = clean.append({'Latency': df.iloc[j].Latency,
-                          'Trigger': 'C2'}, ignore_index=True)
-    clean = clean.append({'Latency': df.iloc[j+1].Latency,
-                          'Trigger': 'C1'}, ignore_index=True)
-    if df.iloc[j].Trigger == 'ARTFCT1':
-    clean = clean.append({'Latency': df.iloc[j].Latency,
-                          'Trigger': 'C2'}, ignore_index=True)
-    for k in range(j, df.shape[0]):
-    if df.iloc[k].Trigger == 'ARTFCT2':
-    clean = clean.append({'Latency': df.iloc[k].Latency,
-                          'Trigger': 'C1'}, ignore_index=True)
-    break
+        if df.iloc[j].Trigger == 'BLINK1':
+            clean = clean.append({'Latency': df.iloc[j].Latency,
+                                  'Trigger': 'C2'}, ignore_index=True)
+            clean = clean.append({'Latency': df.iloc[j+1].Latency,
+                                  'Trigger': 'C1'}, ignore_index=True)
+        if df.iloc[j].Trigger == 'ARTFCT1':
+            clean = clean.append({'Latency': df.iloc[j].Latency,
+                                  'Trigger': 'C2'}, ignore_index=True)
+            for k in range(j, df.shape[0]):
+                if df.iloc[k].Trigger == 'ARTFCT2':
+                    clean = clean.append({'Latency': df.iloc[k].Latency,
+                                          'Trigger': 'C1'}, ignore_index=True)
+                    break
 
     # Of the clean segments that were grabbed, drop all which are shorter than
     # two seconds.
     bad_idx = []
     for j in range(clean.shape[0] - 1):
-    if (clean.iloc[j].Trigger == 'C1' and clean.iloc[j+1].Trigger == 'C2') and\
-       (clean.iloc[j+1].Latency - clean.iloc[j].Latency < 1024):
-       bad_idx.append(j); bad_idx.append(j+1)
+        if (clean.iloc[j].Trigger == 'C1' and clean.iloc[j+1].Trigger == 'C2') and\
+           (clean.iloc[j+1].Latency - clean.iloc[j].Latency < 1024):
+           bad_idx.append(j); bad_idx.append(j+1)
     clean = clean.drop(bad_idx)
     clean = clean.set_index(np.arange(0, clean.shape[0], 1))
 
     if clean.iloc[-1].Trigger == 'C1':
-    clean = clean.drop(clean.shape[0] - 1)
+        clean = clean.drop(clean.shape[0] - 1)
 
     subj_name = evt_files[i].split('/')[-1][:-4]
     clean.to_csv(export_path + '/' + subj_name + '.evt', sep='\t', index=False)

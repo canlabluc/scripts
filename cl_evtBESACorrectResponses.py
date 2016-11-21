@@ -45,13 +45,6 @@ import sys
 import numpy as np
 import pandas as pd
 
-# 1. Grab all prompt-related data -- prompts and responses
-# 2. Filter out responses which are incorrect:
-#       - GO_PROMPT -> RESPONSE -> NO_RESPONSE
-#       - NOGO_PROMPT -> RESPONSE -> INCORRECT_RESPONSE
-# 3. Filter out prompts/responses which do not have 600 ms of open
-#    space post-stimulus.
-
 importpath_conso = sys.argv[1]
 importpath_clean = sys.argv[2]
 exportpath       = sys.argv[3]
@@ -61,6 +54,7 @@ for root, dirs, files in os.walk(importpath_conso):
     evt_files += glob.glob(os.path.join(root, '*.evt'))
 
 for i in range(len(evt_files)):
+    # Open the file, retaining only prompt and response-related data.
     subj_name = evt_files[i].split('/')[-1][:-4]
     df      = pd.read_csv(importpath_conso + subj_name + '.evt', sep='\t')
     cleandf = pd.read_csv(importpath_clean + subj_name + '.evt', sep='\t')
@@ -68,7 +62,7 @@ for i in range(len(evt_files)):
                              'INCORRECT_RESPONSE', 'NO_RESPONSE'])]
     df = df.set_index(np.arange(0, df.shape[0], 1))
 
-    # Filter out incorrect responses
+    # Filter out incorrect responses.
     bad_idx = []
     for i in range(df.shape[0] - 3):
         if df.iloc[i].Trigger == 'GO_PROMPT' and (df.iloc[i+2].Trigger == 'NO_RESPONSE' or
@@ -79,7 +73,7 @@ for i in range(len(evt_files)):
     df = df.drop(df.index[bad_idx])
     df = df.set_index(np.arange(0, df.shape[0], 1))
 
-    # Filter out prompts/responses which are not contained in clean segments
+    # Filter out prompts/responses which are not contained in clean segments.
     bad_idx = []
     for i in range(df.shape[0] - 3):
         if df.iloc[i].Trigger == 'GO_PROMPT' or df.iloc[i].Trigger == 'NOGO_PROMPT':
@@ -90,7 +84,7 @@ for i in range(len(evt_files)):
     df = df.drop(df.index[bad_idx])
     df = df.set_index(np.arange(0, df.shape[0], 1))
 
-    # Filter out prompts/responses which do not have 600ms of post-stimulus clean space
+    # Filter out prompts/responses which do not have 600ms of post-stimulus clean space.
     bad_idx = []
     for i in range(df.shape[0] - 3):
         if df.iloc[i].Trigger == 'GO_PROMPT' or df.iloc[i].Trigger == 'NOGO_PROMPT':
